@@ -1,0 +1,47 @@
+# docker-compose.yml
+# This is your "one-click install" file.
+
+version: "3.8"
+
+services:
+
+  ################################################
+  # BACKEND (Django API)
+  ################################################
+  backend:
+    build:
+      context: ./backend  # Path to the backend folder
+      dockerfile: Dockerfile
+
+    command: >
+       sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
+             python manage.py test &&
+             gunicorn backend.wsgi:application --bind 0.0.0.0:8000"
+    ports:
+      # Exposes the Django app on port 8000
+      - "8000:8000"
+    volumes:
+      # This mounts your local code into the container.
+      # This enables "hot-reloading": you change your Python code,
+      # and the server restarts *inside* the container automatically.
+      - ./backend:/app
+
+  ################################################
+  # FRONTEND (React App served by Nginx)
+  ################################################
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      # The user visits http://localhost and this is what they see
+      - "80:80"
+    depends_on:
+      # Waits for the backend to be ready before starting
+      - backend
+
+
+# This line formally creates the named volume we used for the 'db'
+volumes:
+  postgres_data:
