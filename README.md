@@ -2,7 +2,7 @@
 
 ensure you have docker installed and running
 
-in the root directory run docker-compose up --build
+in the root directory of the apllication (the one with docker-compose.yml) run docker-compose up --build
 
 the app will be running at http://localhost/
 
